@@ -38,7 +38,7 @@ text-align: justify}
 
 * [Platzi](http://www.maestrosdelweb.com/que-son-las-bases-de-datos/). Una base de datos es un “almacén” que nos permite guardar grandes cantidades de información de forma organizada para que luego podamos encontrar y utilizar fácilmente.
 
-## Transformación de Datos
+## Transformación de los Datos
 
 ![Transformación de los Datos](./img/datos.png)
 
