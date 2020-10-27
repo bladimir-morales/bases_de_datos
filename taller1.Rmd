@@ -73,7 +73,7 @@ También existen diferentes tipos de formatos de bases de datos
 Para cualquier proyecto los pasos a seguir son:
 
 * Objetivos
-* Marco Teórico
+* Marco conceptual
 * Recolección de información (encuestas, datos de internet, censos, etc.)
 * **Estructuración de los datos**
 * Análisis de datos/información
@@ -86,7 +86,7 @@ Una de las estructuras más conocidas de R es el data frame (marco de datos), es
 
 ## Paquete dplyr
 
-Este taller se enfocará en el uso de la paquete `dplyr` de R, que fué desarrollado por Hadley Wickham y Romain Francois, como una optimización del paquete `plyr`. 
+Este taller se enfocará en el uso del paquete `dplyr` de R, que fué desarrollado por Hadley Wickham y Romain Francois, como una optimización del paquete `plyr`. 
 
 Este paquete ofrece diferentes bondades en el manejo y administración de data frames en R, ya que simplifica muchas cosas desde la facilidad del código, una mejor funcionalidad y es mucho más rápido en su procesamiento, porque muchas de las operaciones están codificadas en C ++.
 
