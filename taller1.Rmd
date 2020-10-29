@@ -299,14 +299,99 @@ bd_final
 `pipe %>%`: es un operador utilizado para conectar funciones. 
 
 ```{r}
+rm(list=ls())
+
+bd<-read.csv("./BD/elecciones_2020_mundo.csv",quote = "\t") 
+bd_pres<-filter(bd,CANDIDATURA=="PRESIDENTE")
+bd_pres_dep<-filter(bd_pres,PAIS=="Bolivia")
+bd_pres_dep<-select(bd_pres_dep,CANDIDATURA,PAIS,DEPARTAMENTO,INSCRITOS_HABILITADOS:VOTO_EMITIDO_SISTEMA)
+bd_pres_dep_g<-group_by(bd_pres_dep,DEPARTAMENTO)
+bd_pres_dep_gs<-summarise(bd_pres_dep_g,habilitados=sum(INSCRITOS_HABILITADOS),
+                         creemos=sum(CREEMOS),
+                         adn=sum(ADN),
+                         mas=sum(MAS_IPSP),
+                         fpv=sum(FPV),
+                         pan_bol=sum(PAN_BOL),
+                         libre21=sum(LIBRE_21),
+                         cc=sum(CC),
+                         juntos=sum(JUNTOS),
+                         validos=sum(VOTO_VALIDO),
+                         blancos=sum(VOTO_BLANCO),
+                         nulos=sum(VOTO_NULO),
+                         emitidos=sum(VOTO_EMITIDO),
+                         conteo=n())
+
+bd_pres_dep_gs_porc<-mutate(bd_pres_dep_gs,
+                            p_creemos=(creemos/validos)*100,
+                            p_adn=(adn/validos)*100,
+                            p_mas=(mas/validos)*100,
+                            p_fpv=(fpv/validos)*100,
+                            p_pan_bol=(pan_bol/validos)*100,
+                            p_libre21=(libre21/validos)*100,
+                            p_cc=(cc/validos)*100,
+                            p_juntos=(juntos/validos)*100)
+
+```
+
+```{r}
 #rm(list=ls())
 
-#bd<-read.csv("./BD/elecciones_2020_mundo.csv",quote = "\t") 
 
+```
+
+## Paquete tidyr
+
+* gather
+* spread
+
+```{r}
+#install.packages("tidyr")
+library(tidyr)
+```
+
+```{r}
+bd_dep<-select(bd,DEPARTAMENTO,p_creemos:p_juntos)
+head(bd_dep)
+```
+
+* gather
+
+```{r}
+bd_editado<-gather(bd_dep,key="partido",value="porcentaje",p_creemos:p_juntos)
+head(bd_editado)
+```
+
+* spread
+
+```{r}
+bd_recuperado<-spread(bd_editado,key="partido",value="porcentaje")
+head(bd_recuperado)
+```
+
+## Paquete ggplot
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+ggplot(bd_editado,aes(x=DEPARTAMENTO,y=porcentaje,fill=partido))+
+  geom_bar(stat="identity",position = "dodge")
+```
+
+```{r}
+bd_lapaz<-filter(bd_editado,DEPARTAMENTO=="La Paz")
+
+ggplot(bd_lapaz,aes(x=partido,y=porcentaje,fill=partido))+
+  geom_bar(stat="identity",position = "dodge")+  
+  coord_flip()
 ```
 
 # Referencias
 
-* [Rubén Sanchez Sancho - Programación en R](https://rsanchezs.gitbooks.io/rprogramming/content/chapter9/select.html)
+* Rubén Sanchez Sancho, [Programación en R](https://rsanchezs.gitbooks.io/rprogramming/content/chapter9/select.html)
 
-* 
+* Garrett Grolemund \& Hadley Wickham [R for Data Science](https://r4ds.had.co.nz/)
+
+* Yihui Xie, J. J. Allaire, Garrett Grolemund, [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+
