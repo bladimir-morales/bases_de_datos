@@ -19,7 +19,8 @@ text-align: justify}
 </style>
 
 # Datos
-## ¿Qué son los datos?
+
+## ¿Qué son los datos
 
 * [Wikipedia](https://es.wikipedia.org/wiki/Dato). Un dato es una representación simbólica (numérica, alfabética, algorítmica, espacial, etc.) de un atributo o variable cuantitativa o cualitativa. 
 
@@ -146,7 +147,13 @@ levels(factor(bd$CANDIDATURA))
 `filter`: extrae/filtra un subconjunto de filas de un data frame basado en una condición lógica.
 
 ```{r}
-bd_pres<-filter(bd,CANDIDATURA=="PRESIDENTE")
+bd_pres<-filter(bd,CANDIDATURA=="PRESIDENTE",
+                DEPARTAMENTO=="Santa Cruz") %>% 
+  group_by(MUNICIPIO) %>% 
+  summarise(total=n()) %>% 
+  mutate(porcentaje=round(total/sum(total)*100,2))
+  
+
 ```
 
 
@@ -204,6 +211,7 @@ names(bd_pres_dep_g)
 
 ```{r}
 str(bd_pres_dep_g)
+
 ```
 
 ```{r}
@@ -216,7 +224,8 @@ class(bd_pres_dep_g)
 `summarise`/`summarize`: genera estadísticas resumidas de diferentes variables.
 
 ```{r}
-bd_pres_dep_gs<-summarise(bd_pres_dep_g,habilitados=sum(INSCRITOS_HABILITADOS),
+bd_pres_dep_gs<-summarise(bd_pres_dep_g,
+                          habilitados=sum(INSCRITOS_HABILITADOS),
                          creemos=sum(CREEMOS),
                          adn=sum(ADN),
                          mas=sum(MAS_IPSP),
@@ -242,7 +251,7 @@ head(bd_pres_dep_gs,10)
 
 ```{r}
 bd_pres_dep_gs_porc<-mutate(bd_pres_dep_gs,
-                            p_creemos=(creemos/validos)*100,
+                            p_creemos=round((creemos/validos)*100,2),
                             p_adn=(adn/validos)*100,
                             p_mas=(mas/validos)*100,
                             p_fpv=(fpv/validos)*100,
@@ -263,8 +272,8 @@ head(bd_pres_dep_gs_porc,10)
 
 ```{r}
 bd_final<-select(bd_pres_dep_gs_porc,DEPARTAMENTO,p_creemos:p_juntos)
-
 ```
+
 ```{r}
 bd_final<-rename(bd_final,departamento=DEPARTAMENTO)
 ```
@@ -279,7 +288,7 @@ head(bd_final,10)
 
 
 ```{r}
-bd_final<-arrange(bd_final,p_creemos)
+bd_final<-arrange(bd_final,desc(departamento))
 bd_final
 ```
 
@@ -289,7 +298,7 @@ bd_final
 ```
 
 ```{r}
-bd_final<-arrange(bd_final,desc(p_mas,p_cc,p_creemos,))
+bd_final<-arrange(bd_final,desc(p_mas,p_cc,p_creemos))
 bd_final
 ```
 
@@ -301,12 +310,12 @@ bd_final
 ```{r}
 rm(list=ls())
 
-bd<-read.csv("./BD/elecciones_2020_mundo.csv",quote = "\t") 
-bd_pres<-filter(bd,CANDIDATURA=="PRESIDENTE")
-bd_pres_dep<-filter(bd_pres,PAIS=="Bolivia")
-bd_pres_dep<-select(bd_pres_dep,CANDIDATURA,PAIS,DEPARTAMENTO,INSCRITOS_HABILITADOS:VOTO_EMITIDO_SISTEMA)
-bd_pres_dep_g<-group_by(bd_pres_dep,DEPARTAMENTO)
-bd_pres_dep_gs<-summarise(bd_pres_dep_g,habilitados=sum(INSCRITOS_HABILITADOS),
+bd<-read.csv("./BD/elecciones_2020_mundo.csv",quote = "\t") %>% 
+  filter(CANDIDATURA=="PRESIDENTE" & PAIS=="Bolivia",
+         DEPARTAMENTO=="Santa Cruz") %>% 
+  select(CANDIDATURA,PAIS,DEPARTAMENTO,INSCRITOS_HABILITADOS:VOTO_EMITIDO_SISTEMA) %>% 
+  group_by(DEPARTAMENTO) %>% 
+  summarise(habilitados=sum(INSCRITOS_HABILITADOS),
                          creemos=sum(CREEMOS),
                          adn=sum(ADN),
                          mas=sum(MAS_IPSP),
@@ -319,10 +328,8 @@ bd_pres_dep_gs<-summarise(bd_pres_dep_g,habilitados=sum(INSCRITOS_HABILITADOS),
                          blancos=sum(VOTO_BLANCO),
                          nulos=sum(VOTO_NULO),
                          emitidos=sum(VOTO_EMITIDO),
-                         conteo=n())
-
-bd_pres_dep_gs_porc<-mutate(bd_pres_dep_gs,
-                            p_creemos=(creemos/validos)*100,
+                         conteo=n()) %>% 
+  mutate(p_creemos=(creemos/validos)*100,
                             p_adn=(adn/validos)*100,
                             p_mas=(mas/validos)*100,
                             p_fpv=(fpv/validos)*100,
@@ -333,15 +340,11 @@ bd_pres_dep_gs_porc<-mutate(bd_pres_dep_gs,
 
 ```
 
-```{r}
-#rm(list=ls())
-
-
-```
 
 ## Paquete tidyr
 
 * gather
+
 * spread
 
 ```{r}
@@ -375,8 +378,8 @@ library(ggplot2)
 ```
 
 ```{r}
-ggplot(bd_editado,aes(x=DEPARTAMENTO,y=porcentaje,fill=partido))+
-  geom_bar(stat="identity",position = "dodge")
+ggplot(bd_editado,aes(x=DEPARTAMENTO,y=porcentaje,fill=partido)) +
+  geom_bar(stat="identity")
 ```
 
 ```{r}
@@ -394,4 +397,8 @@ ggplot(bd_lapaz,aes(x=partido,y=porcentaje,fill=partido))+
 * Garrett Grolemund \& Hadley Wickham [R for Data Science](https://r4ds.had.co.nz/)
 
 * Yihui Xie, J. J. Allaire, Garrett Grolemund, [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+
+# R Bolivia
+
+<http://bit.ly/rbolivia>
 
